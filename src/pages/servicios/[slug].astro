@@ -1,0 +1,55 @@
+---
+// Una página por servicio: cada una apunta a una búsqueda local distinta (ej. "alarmas en Trelew")
+import Layout from '../../layouts/Layout.astro';
+import Icono from '../../components/Icono.astro';
+import { servicios, cobertura, enlaceContacto, type Servicio } from '../../data/sitio';
+
+export function getStaticPaths() {
+  return servicios.map((s) => ({ params: { slug: s.slug }, props: { servicio: s } }));
+}
+const { servicio } = Astro.props as { servicio: Servicio };
+const otros = servicios.filter((s) => s.slug !== servicio.slug).slice(0, 4);
+---
+
+<Layout titulo={`${servicio.nombre} en Trelew y la Patagonia · Sinergia Home`} descripcion={`${servicio.descripcion} Trelew, Playa Unión, Esquel y Bariloche.`}>
+  <main class="grilla px-5 pt-36 pb-24">
+    <div class="mx-auto max-w-6xl">
+      <a href="/#servicios" class="text-sm text-niebla hover:text-acento">← Todos los servicios</a>
+      <div class="mt-8 grid gap-12 lg:grid-cols-[1.3fr_1fr]">
+        <div>
+          <span class="grid size-16 place-items-center rounded-2xl bg-acento/10 text-acento ring-1 ring-acento/30"><Icono nombre={servicio.icono} class="size-8" /></span>
+          <h1 class="mt-6 font-display text-5xl font-bold tracking-tight">{servicio.nombre}</h1>
+          <p class="mt-5 text-xl leading-relaxed text-niebla">{servicio.descripcion}</p>
+          <h2 class="mt-10 font-display text-xl font-semibold">Qué incluye</h2>
+          <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+            {servicio.incluye.map((i) => (
+              <li class="flex items-start gap-3 rounded-2xl border border-borde bg-panel p-4">
+                <span class="mt-2 size-2 shrink-0 rounded-full bg-acento"></span> {i}
+              </li>
+            ))}
+          </ul>
+          <p class="mt-8 text-niebla"><strong class="text-white">Ideal para:</strong> {servicio.ideal}</p>
+        </div>
+        <aside class="h-fit rounded-[2rem] border border-borde bg-panel p-8 lg:sticky lg:top-28">
+          <h2 class="font-display text-2xl font-semibold">¿Lo querés en tu casa o negocio?</h2>
+          <p class="mt-3 text-niebla">Coordinamos un relevamiento y te pasamos una propuesta.</p>
+          <a href={enlaceContacto(`Hola Sinergia Home! Me interesa ${servicio.nombre.toLowerCase()}.`)} target="_blank" rel="noopener" class="mt-6 flex items-center justify-center gap-2 rounded-2xl bg-acento px-6 py-4 font-semibold text-noche transition hover:brightness-110">
+            Pedí tu presupuesto <Icono nombre="flecha" class="size-4" />
+          </a>
+          <p class="mt-6 text-xs tracking-[3px] text-niebla uppercase">Zonas</p>
+          <p class="mt-2 text-sm text-niebla">{cobertura.map((c) => c.ciudad).join(' · ')}</p>
+        </aside>
+      </div>
+
+      <h2 class="mt-20 font-display text-2xl font-semibold">Otros servicios</h2>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {otros.map((s) => (
+          <a href={`/servicios/${s.slug}`} class="rounded-3xl border border-borde bg-panel p-5 transition hover:border-acento/50">
+            <Icono nombre={s.icono} class="size-6 text-acento" />
+            <p class="mt-3 font-display font-semibold">{s.nombre}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </main>
+</Layout>

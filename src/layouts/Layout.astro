@@ -1,0 +1,98 @@
+---
+import '../styles/global.css';
+import Icono from '../components/Icono.astro';
+import { empresa, servicios, cobertura, enlaceContacto } from '../data/sitio';
+
+interface Props {
+  titulo?: string;
+  descripcion?: string;
+}
+const {
+  titulo = 'Domótica, cámaras y alarmas en Trelew · Sinergia Home',
+  descripcion = 'Venta e instalación de domótica, cámaras de seguridad, alarmas, audio y video, redes WiFi y cerraduras inteligentes en Trelew y la Patagonia.',
+} = Astro.props;
+
+const links = [
+  { href: '/#servicios', texto: 'Servicios' },
+  { href: '/#obras', texto: 'Obras' },
+  { href: '/#arquitectos', texto: 'Arquitectos' },
+  { href: '/#proyecto', texto: 'Armá tu proyecto' },
+];
+
+const negocio = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: empresa.nombre,
+  description: descripcion,
+  address: { '@type': 'PostalAddress', addressLocality: 'Trelew', addressRegion: 'Chubut', postalCode: '9100', addressCountry: 'AR' },
+  areaServed: cobertura.map((c) => ({ '@type': 'City', name: c.ciudad })),
+  sameAs: [empresa.instagram],
+  knowsAbout: servicios.map((s) => s.nombre),
+};
+---
+
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titulo}</title>
+    <meta name="description" content={descripcion} />
+    <meta name="theme-color" content="#0a0f14" />
+    <meta name="robots" content="noindex" /> <!-- DEMO: sacar al publicar -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <script type="application/ld+json" set:html={JSON.stringify(negocio)} />
+  </head>
+  <body class="font-sans antialiased">
+    <header class="fixed inset-x-0 top-3 z-50 px-3">
+      <nav class="mx-auto flex max-w-6xl items-center justify-between rounded-2xl border border-borde bg-noche/75 py-2 pr-2 pl-4 backdrop-blur-md">
+        <a href="/" class="flex items-center gap-2.5">
+          <span class="grid size-9 place-items-center rounded-xl bg-acento/10 text-acento ring-1 ring-acento/30"><Icono nombre="casa" class="size-5" /></span>
+          <span class="leading-tight">
+            <span class="block font-display text-base font-bold tracking-tight">sinergia<span class="text-acento">home</span></span>
+            <span class="block text-[10px] tracking-[3px] text-niebla uppercase">{empresa.bajada}</span>
+          </span>
+        </a>
+        <ul class="hidden items-center gap-1 md:flex">
+          {links.map((l) => <li><a href={l.href} class="rounded-xl px-3.5 py-2 text-sm text-niebla transition hover:bg-white/5 hover:text-white">{l.texto}</a></li>)}
+        </ul>
+        <a href={enlaceContacto()} target="_blank" rel="noopener" class="flex items-center gap-2 rounded-xl bg-acento px-4 py-2.5 text-sm font-semibold text-noche transition hover:brightness-110">
+          <Icono nombre="mensaje" class="size-4" /> <span class="hidden sm:inline">Pedí tu presupuesto</span><span class="sm:hidden">Contacto</span>
+        </a>
+      </nav>
+    </header>
+
+    <slot />
+
+    <footer class="border-t border-borde px-5 py-14">
+      <div class="mx-auto grid max-w-6xl gap-10 md:grid-cols-4">
+        <div class="md:col-span-2">
+          <p class="font-display text-2xl font-bold">sinergia<span class="text-acento">home</span></p>
+          <p class="mt-3 max-w-sm text-sm text-niebla">Casas inteligentes, seguridad, audio, redes y domótica. Venta e instalación desde {empresa.base} para toda la Patagonia.</p>
+          <a href={empresa.instagram} target="_blank" rel="noopener" class="mt-5 inline-flex items-center gap-2 text-sm text-niebla hover:text-acento"><Icono nombre="instagram" class="size-4" /> {empresa.usuarioInstagram}</a>
+        </div>
+        <div>
+          <p class="mb-3 text-xs font-semibold tracking-[3px] text-niebla uppercase">Servicios</p>
+          <ul class="grid gap-2 text-sm">
+            {servicios.map((s) => <li><a href={`/servicios/${s.slug}`} class="text-niebla hover:text-white">{s.nombre}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <p class="mb-3 text-xs font-semibold tracking-[3px] text-niebla uppercase">Zonas</p>
+          <ul class="grid gap-2 text-sm text-niebla">
+            {cobertura.map((c) => <li class="flex items-center gap-2"><Icono nombre="ubicacion" class="size-4 text-acento" /> {c.ciudad}</li>)}
+          </ul>
+        </div>
+      </div>
+      <p class="mx-auto mt-12 max-w-6xl border-t border-borde pt-6 text-xs text-niebla">© {new Date().getFullYear()} {empresa.nombre} · {empresa.base}</p>
+    </footer>
+
+    <script>
+      const obs = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && (e.target.classList.add('visible'), obs.unobserve(e.target))), { rootMargin: '0px 0px -10% 0px' });
+      document.querySelectorAll('[data-revelar]').forEach((el) => { el.classList.add('revelar'); obs.observe(el); });
+    </script>
+  </body>
+</html>

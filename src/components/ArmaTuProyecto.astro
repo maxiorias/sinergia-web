@@ -1,0 +1,87 @@
+---
+// "Armá tu proyecto": la persona elige qué necesita y se arma el mensaje de consulta.
+// Con WhatsApp configurado lo abre con el texto listo; si no, lo copia y abre el chat de Instagram.
+import Icono from './Icono.astro';
+import { servicios, cobertura, empresa, enlaceInstagramDM } from '../data/sitio';
+
+const lugares = ['Casa', 'Departamento', 'Local o comercio', 'Oficina o empresa', 'Obra nueva / desarrollo'];
+const zonas = [...cobertura.map((c) => c.ciudad), 'Otra zona'];
+const chip =
+  'cursor-pointer rounded-xl border border-borde px-3.5 py-2.5 text-sm text-niebla transition select-none hover:border-acento/50 has-[:checked]:border-acento has-[:checked]:bg-acento/10 has-[:checked]:text-white';
+---
+
+<form id="arma-proyecto" class="rounded-[2rem] border border-borde bg-panel p-6 sm:p-9" data-whatsapp={empresa.whatsapp} data-instagram={enlaceInstagramDM}>
+  <fieldset>
+    <legend class="font-display text-lg font-semibold">1. ¿Qué querés sumar?</legend>
+    <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {servicios.map((s) => (
+        <label class={`${chip} flex items-center gap-2`}>
+          <input type="checkbox" name="servicio" value={s.nombre} class="sr-only" />
+          <Icono nombre={s.icono} class="size-4 shrink-0" /> {s.nombre}
+        </label>
+      ))}
+    </div>
+  </fieldset>
+
+  <fieldset class="mt-8">
+    <legend class="font-display text-lg font-semibold">2. ¿Dónde?</legend>
+    <div class="mt-4 flex flex-wrap gap-2">
+      {lugares.map((l, i) => (
+        <label class={chip}><input type="radio" name="lugar" value={l} class="sr-only" checked={i === 0} /> {l}</label>
+      ))}
+    </div>
+  </fieldset>
+
+  <fieldset class="mt-8">
+    <legend class="font-display text-lg font-semibold">3. ¿En qué zona?</legend>
+    <div class="mt-4 flex flex-wrap gap-2">
+      {zonas.map((z, i) => (
+        <label class={chip}><input type="radio" name="zona" value={z} class="sr-only" checked={i === 0} /> {z}</label>
+      ))}
+    </div>
+  </fieldset>
+
+  <div class="mt-8 rounded-2xl border border-dashed border-borde bg-noche/60 p-4">
+    <p class="text-xs font-semibold tracking-[3px] text-niebla uppercase">Tu mensaje</p>
+    <p id="vista-mensaje" class="mt-2 text-sm leading-relaxed"></p>
+  </div>
+
+  <button type="submit" class="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-acento px-6 py-4 font-semibold text-noche transition hover:brightness-110">
+    <Icono nombre="mensaje" class="size-5" /> <span id="texto-boton">Enviar consulta</span>
+  </button>
+  <p id="aviso-copia" class="mt-3 text-center text-xs text-niebla" aria-live="polite"></p>
+</form>
+
+<script>
+  const form = document.getElementById('arma-proyecto') as HTMLFormElement;
+  const vista = document.getElementById('vista-mensaje')!;
+  const aviso = document.getElementById('aviso-copia')!;
+  const whatsapp = form.dataset.whatsapp;
+  if (!whatsapp) document.getElementById('texto-boton')!.textContent = 'Copiar y enviar por Instagram';
+
+  function mensaje() {
+    const d = new FormData(form);
+    const elegidos = d.getAll('servicio') as string[];
+    const que = elegidos.length ? elegidos.join(', ').toLowerCase() : 'una solución a medida';
+    return `Hola Sinergia Home! Me interesa ${que} para ${String(d.get('lugar')).toLowerCase()} en ${d.get('zona')}. ¿Podemos coordinar un relevamiento?`;
+  }
+  const actualizar = () => (vista.textContent = mensaje());
+  form.addEventListener('change', actualizar);
+  actualizar();
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const texto = mensaje();
+    if (whatsapp) {
+      window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(texto)}`, '_blank', 'noopener');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(texto);
+      aviso.textContent = 'Copiamos tu mensaje: pegalo en el chat de Instagram que se abre.';
+    } catch {
+      aviso.textContent = 'Copiá el mensaje de arriba y pegalo en el chat de Instagram.';
+    }
+    window.open(form.dataset.instagram, '_blank', 'noopener');
+  });
+</script>
