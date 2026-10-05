@@ -1,0 +1,30 @@
+---
+// Animación de marca (three.js, ver src/scripts/red.ts). three.js se descarga recién cuando entra en pantalla.
+import Logo from './Logo.astro';
+---
+
+<div id="red-sinergia" class="relative aspect-[5/4] w-full">
+  <!-- Respaldo: el logo estático si no hay WebGL -->
+  <div id="red-respaldo" class="absolute inset-0 grid place-items-center">
+    <Logo tono="blanco" class="w-3/4 opacity-90" />
+  </div>
+</div>
+
+<script>
+  const contenedor = document.getElementById('red-sinergia')!;
+  const reducirMovimiento = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let webgl = false;
+  try {
+    webgl = !!document.createElement('canvas').getContext('webgl2');
+  } catch {}
+  if (webgl) {
+    const obs = new IntersectionObserver(async ([e]) => {
+      if (!e.isIntersecting) return;
+      obs.disconnect();
+      const { iniciarRed } = await import('../scripts/red');
+      iniciarRed({ contenedor, reducirMovimiento });
+      document.getElementById('red-respaldo')?.remove();
+    }, { rootMargin: '200px' });
+    obs.observe(contenedor);
+  }
+</script>

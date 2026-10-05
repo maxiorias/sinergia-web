@@ -1,0 +1,21 @@
+---
+// Logo de Sinergia Home en vector, con las medidas tomadas del original (sinergia.jfif).
+// Techo: dos trazos a 45°; óvalo visible en la mitad de abajo; texto en geométrica (Questrial).
+// Reemplazar por el vector oficial cuando lo tengamos.
+interface Props { class?: string; tono?: 'azul' | 'blanco' }
+const { class: clase = 'h-10 w-auto', tono = 'azul' } = Astro.props;
+const color = tono === 'blanco' ? '#ffffff' : '#0000fe';
+const texto = tono === 'blanco' ? '#ffffff' : '#0d1020';
+const id = `ovalo-${tono}`;
+---
+<svg class={clase} viewBox="0 170 350 252" role="img" aria-label="Sinergia Home">
+  <defs>
+    <linearGradient id={id} gradientUnits="userSpaceOnUse" x1="0" y1="255" x2="0" y2="305">
+      <stop offset="0" stop-color={color} stop-opacity="0" />
+      <stop offset="1" stop-color={color} stop-opacity="1" />
+    </linearGradient>
+  </defs>
+  <ellipse cx="174.5" cy="300" rx="155" ry="111.5" fill="none" stroke={`url(#${id})`} stroke-width="9" />
+  <path d="M167 184 64 287M182 184 285 287" stroke={color} stroke-width="17" />
+  <text x="174.5" y="340" text-anchor="middle" textLength="352" lengthAdjust="spacingAndGlyphs" font-family="Questrial, 'Century Gothic', sans-serif" font-size="58" fill={texto}>sinergiahome</text>
+</svg>

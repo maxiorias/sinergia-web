@@ -1,3 +1,12 @@
+import fotoCamioneta from '../assets/obras/camioneta.jpg';
+import fotoPanel from '../assets/obras/panel-echo-show.jpg';
+import fotoCerradura from '../assets/obras/cerradura-biometrica.jpg';
+import fotoRack from '../assets/obras/rack.jpg';
+import fotoCelular from '../assets/obras/control-celular.jpg';
+import fotoCedia from '../assets/obras/cedia-2024.jpg';
+import fotoPlano from '../assets/obras/termostato-plano.jpg';
+import type { ImageMetadata } from 'astro';
+
 // Contenido del sitio en un solo lugar. Sale del Instagram de Sinergia Home (@sinergiahome).
 // DEMO: textos de servicios a validar con la empresa antes de publicar.
 
@@ -31,11 +40,13 @@ export type Servicio = {
   descripcion: string;
   incluye: string[];
   ideal: string;
+  foto?: ImageMetadata;
 };
 
 export const servicios: Servicio[] = [
   {
     slug: 'domotica',
+    foto: fotoPanel,
     nombre: 'Domótica',
     icono: 'casa',
     resumen: 'Luces, persianas, climatización y escenas controladas desde el celular o por voz.',
@@ -46,6 +57,7 @@ export const servicios: Servicio[] = [
   },
   {
     slug: 'camaras',
+    foto: fotoCamioneta,
     nombre: 'Cámaras de seguridad',
     icono: 'camara',
     resumen: 'Videovigilancia con IA, domos PTZ y monitoreo desde el celular.',
@@ -65,6 +77,7 @@ export const servicios: Servicio[] = [
   },
   {
     slug: 'climatizacion',
+    foto: fotoPlano,
     nombre: 'Climatización',
     icono: 'clima',
     resumen: 'Control inteligente de la temperatura, con horarios y desde cualquier lugar.',
@@ -83,6 +96,7 @@ export const servicios: Servicio[] = [
   },
   {
     slug: 'porteria',
+    foto: fotoPanel,
     nombre: 'Portería',
     icono: 'porteria',
     resumen: 'Porteros y videoporteros para ver y atender quién toca desde el celular.',
@@ -92,6 +106,7 @@ export const servicios: Servicio[] = [
   },
   {
     slug: 'redes-wifi',
+    foto: fotoRack,
     nombre: 'Redes WiFi',
     icono: 'wifi',
     resumen: 'WiFi que llega a toda la casa, sin cortes y con cableado prolijo.',
@@ -101,6 +116,7 @@ export const servicios: Servicio[] = [
   },
   {
     slug: 'cerraduras',
+    foto: fotoCerradura,
     nombre: 'Cerraduras inteligentes',
     icono: 'candado',
     resumen: 'Abrí con huella, código o desde el celular, y sabé quién entró.',
@@ -110,12 +126,16 @@ export const servicios: Servicio[] = [
   },
 ];
 
-// Obras y novedades: sacadas de sus publicaciones
+// Obras y novedades: sacadas de sus publicaciones (fotos: capturas de su Instagram, reemplazar por originales)
+import fotoGenerac from '../assets/obras/generac.jpg';
+import fotoCrestron from '../assets/obras/crestron.jpg';
+import fotoVimar from '../assets/obras/vimar.jpg';
+
 export const casos = [
-  { titulo: 'Automatización con Generac', texto: 'Puesta en marcha y automatización de un grupo electrógeno Generac.', etiqueta: 'Energía' },
-  { titulo: 'Sala de videoconferencia Crestron', texto: 'Sistema de videoconferencia profesional para reuniones.', etiqueta: 'Audio y video' },
-  { titulo: 'Seguridad con IA', texto: 'Radares, domos PTZ y reconocimiento facial a 150 metros.', etiqueta: 'Cámaras' },
-  { titulo: 'Línea italiana Vimar', texto: 'Teclas y tomas de diseño para proyectos de arquitectura.', etiqueta: 'Domótica' },
+  { titulo: 'Sala de videoconferencia Crestron', lugar: 'Gobierno del Chubut', texto: 'Sistema de videoconferencia profesional con panel de control táctil.', etiqueta: 'Audio y video', foto: fotoCrestron },
+  { titulo: 'Automatización con Generac', lugar: 'Puesta en marcha', texto: 'Instalación y automatización de grupo electrógeno para que la casa nunca se quede sin energía.', etiqueta: 'Energía', foto: fotoGenerac },
+  { titulo: 'Línea italiana Vimar', lugar: 'Para arquitectos', texto: 'Teclas y tomas de diseño para proyectos de arquitectura y desarrollos.', etiqueta: 'Domótica', foto: fotoVimar },
+  { titulo: 'Acceso biométrico', lugar: 'Cerraduras inteligentes', texto: 'Reconocimiento facial y apertura remota: olvidate de andar con llaves.', etiqueta: 'Seguridad', foto: fotoCerradura },
 ];
 
 export const marcas = ['Crestron', 'Vimar', 'Generac', 'Google Home'];
@@ -145,3 +165,19 @@ export const preguntas = [
     respuesta: 'Sí. Acompañamos proyectos desde el plano: preinstalación, cableado, línea de teclas de diseño e integración de sistemas.',
   },
 ];
+
+// Galería "En obra": capturas de sus reels (reemplazar por los originales en alta)
+export const galeria = [
+  { foto: fotoCamioneta, texto: 'En camino a la próxima obra', alto: true },
+  { foto: fotoPanel, texto: 'Echo Show 15 + Ring Doorbell Pro: puerta y portón desde la pared' },
+  { foto: fotoCelular, texto: 'Toda la casa desde el celular, también con Siri', alto: true },
+  { foto: fotoRack, texto: 'Racks y redes: así los recibimos y así los dejamos' },
+  { foto: fotoPlano, texto: 'Termostato y climatización planificados sobre el plano' },
+  { foto: fotoCerradura, texto: 'Acceso con reconocimiento facial', alto: true },
+];
+
+export const cedia = {
+  foto: fotoCedia,
+  titulo: 'Nos capacitamos en CEDIA 2024',
+  texto: 'Viajamos a la feria internacional de integración residencial en Denver (EE.UU.) para traer a la Patagonia lo último en casas inteligentes.',
+};

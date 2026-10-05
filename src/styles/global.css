@@ -1,45 +1,26 @@
 @import "tailwindcss";
 
 @theme {
-  --color-noche: #0a0f14;
-  --color-panel: #111922;
-  --color-borde: #1f2b37;
-  --color-niebla: #93a4b5;
-  --color-acento: #2ee6c5;
-  --color-acento-2: #4da3ff;
+  /* Identidad de Sinergia Home: azul eléctrico, blanco y negro */
+  --color-marca: #0000fe;
+  --color-azul: #1a1aff;
+  --color-azul-claro: #e8ebff;
+  --color-noche: #05072a;
+  --color-tinta: #0d1020;
+  --color-gris: #5b6275;
+  --color-linea: #e4e7ef;
+  --color-suave: #f5f6fb;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", "Inter", ui-sans-serif, sans-serif;
+  --font-display: "Outfit", "Inter", ui-sans-serif, sans-serif;
 }
 
 html { scroll-behavior: smooth; scroll-padding-top: 6rem; }
-body { background: var(--color-noche); color: #e8eef4; }
-
-/* Grilla de fondo tipo plano técnico */
-.grilla {
-  background-image:
-    linear-gradient(rgb(255 255 255 / 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 0.04) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
-
-.texto-acento {
-  background: linear-gradient(90deg, var(--color-acento), var(--color-acento-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-@keyframes pulso { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-.pulso { animation: pulso 1.6s ease-in-out infinite; }
-
-@keyframes barrido { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
-.barrido { animation: barrido 3.5s linear infinite; }
+body { background: #fff; color: var(--color-tinta); }
 
 .revelar { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
 .revelar.visible { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .pulso, .barrido { animation: none; }
   .revelar { opacity: 1; transform: none; transition: none; }
 }
