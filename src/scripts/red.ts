@@ -7,7 +7,7 @@ type Opciones = { contenedor: HTMLElement; reducirMovimiento: boolean };
 const BLANCO = new THREE.Color(0xffffff);
 const CELESTE = new THREE.Color(0x8fa8ff);
 
-export function iniciarRed({ contenedor, reducirMovimiento }: Opciones) {
+export async function iniciarRed({ contenedor, reducirMovimiento }: Opciones) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.domElement.className = 'absolute inset-0 size-full';
@@ -31,24 +31,8 @@ export function iniciarRed({ contenedor, reducirMovimiento }: Opciones) {
   ctx.fillRect(0, 0, 64, 64);
   const punto = new THREE.CanvasTexture(lienzo);
 
-  // ---------- Forma del logo: techo (dos trazos) + óvalo ----------
-  const destino: number[] = [];
-  const azar = (a: number) => (Math.random() - 0.5) * a;
-  function trazo(x1: number, y1: number, x2: number, y2: number, n: number, grosor: number) {
-    for (let i = 0; i < n; i++) {
-      const t = Math.random();
-      destino.push(x1 + (x2 - x1) * t + azar(grosor), y1 + (y2 - y1) * t + azar(grosor), azar(0.5));
-    }
-  }
-  trazo(-2.4, -0.2, -0.25, 2.55, 900, 0.34); // ala izquierda del techo
-  trazo(0.25, 2.55, 2.4, -0.2, 900, 0.34); // ala derecha
-  const RX = 4.6, RY = 1.65, CY = -0.85;
-  for (let i = 0; i < 1500; i++) {
-    const a = Math.random() * Math.PI * 2;
-    // El óvalo se desvanece arriba, como en el logo
-    if (Math.sin(a) > 0.55 && Math.random() < 0.8) continue;
-    destino.push(Math.cos(a) * RX + azar(0.12), CY + Math.sin(a) * RY + azar(0.12), azar(0.4));
-  }
+  // ---------- Forma del logo: se dibuja en un lienzo invisible y cada píxel con trazo es una partícula ----------
+  const { destino, esTexto, nitido, ancho, alto, unidad, centroY } = await muestrearLogo(contenedor.clientWidth < 640 ? 4200 : 7500);
   const cantidad = destino.length / 3;
 
   const inicio = new Float32Array(cantidad * 3);
@@ -60,7 +44,8 @@ export function iniciarRed({ contenedor, reducirMovimiento }: Opciones) {
   const colores = new Float32Array(cantidad * 3);
   const fases = new Float32Array(cantidad);
   for (let i = 0; i < cantidad; i++) {
-    BLANCO.clone().lerp(CELESTE, Math.random() * 0.5).toArray(colores, i * 3);
+    // El texto va blanco; el techo y el óvalo, con un toque celeste
+    BLANCO.clone().lerp(CELESTE, esTexto[i] ? Math.random() * 0.15 : 0.25 + Math.random() * 0.45).toArray(colores, i * 3);
     fases[i] = Math.random() * Math.PI * 2;
   }
   const geoLogo = new THREE.BufferGeometry();
@@ -68,23 +53,34 @@ export function iniciarRed({ contenedor, reducirMovimiento }: Opciones) {
   geoLogo.setAttribute('color', new THREE.BufferAttribute(colores, 3));
   const logo = new THREE.Points(
     geoLogo,
-    new THREE.PointsMaterial({ size: 0.11, map: punto, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })
+    new THREE.PointsMaterial({ size: 0.075, map: punto, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })
   );
   grupo.add(logo);
 
-  // ---------- Dispositivos alrededor y conexiones al centro ----------
+  // ---------- Logo nítido que aparece cuando las partículas se arman ----------
+  const texturaLogo = new THREE.CanvasTexture(nitido);
+  texturaLogo.colorSpace = THREE.SRGBColorSpace;
+  texturaLogo.anisotropy = 4;
+  const materialNitido = new THREE.MeshBasicMaterial({ map: texturaLogo, transparent: true, opacity: 0, depthWrite: false });
+  const planoLogo = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), materialNitido);
+  planoLogo.position.z = 0.02;
+  grupo.add(planoLogo);
+
+  // ---------- Dispositivos alrededor del óvalo ----------
+  const RX = 155 * unidad, RY = 111.5 * unidad;
   const nodos: THREE.Vector3[] = [];
-  for (let i = 0; i < 9; i++) {
-    const a = (i / 9) * Math.PI * 2 + 0.3;
-    nodos.push(new THREE.Vector3(Math.cos(a) * 6.4, Math.sin(a) * 3.4 - 0.2, -1.5 + Math.sin(a * 2) * 1.2));
+  const anclas: THREE.Vector3[] = [];
+  for (let i = 0; i < 7; i++) {
+    const a = Math.PI + 0.15 + (i / 6) * (Math.PI - 0.3); // de izquierda a derecha por abajo
+    anclas.push(new THREE.Vector3(Math.cos(a) * RX, centroY + Math.sin(a) * RY, 0));
+    nodos.push(new THREE.Vector3(Math.cos(a) * RX * 1.32, centroY + Math.sin(a) * RY * 1.38, -0.6 + Math.sin(a * 3) * 0.6));
   }
-  const centro = new THREE.Vector3(0, 0.6, 0);
   const geoNodos = new THREE.BufferGeometry().setFromPoints(nodos);
   const materialNodos = new THREE.PointsMaterial({ size: 0.42, map: punto, color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
   grupo.add(new THREE.Points(geoNodos, materialNodos));
 
   const lineas: THREE.Vector3[] = [];
-  nodos.forEach((n) => lineas.push(n, centro));
+  nodos.forEach((n, i) => lineas.push(n, anclas[i]));
   const materialLineas = new THREE.LineBasicMaterial({ color: 0x8fa8ff, transparent: true, opacity: 0 });
   grupo.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(lineas), materialLineas));
 
@@ -107,7 +103,9 @@ export function iniciarRed({ contenedor, reducirMovimiento }: Opciones) {
     renderer.setSize(width, height, false);
     camara.aspect = width / height;
     // Que el logo entre entero aunque el recuadro sea angosto
-    camara.position.z = width / height < 1 ? 10.5 / (width / height) ** 0.8 : 10.5;
+    // Distancia mínima para que entre el logo completo (~10,8 unidades de ancho, contando la red) con margen
+    const tanMedio = Math.tan(THREE.MathUtils.degToRad(camara.fov / 2));
+    camara.position.z = Math.max(10.5, 10.8 / camara.aspect / (2 * tanMedio));
     camara.updateProjectionMatrix();
     if (reducirMovimiento) dibujar(4);
   }
@@ -126,6 +124,11 @@ export function iniciarRed({ contenedor, reducirMovimiento }: Opciones) {
     }
     geoLogo.attributes.position.needsUpdate = true;
 
+    // Cuando el logo ya está armado aparece la versión nítida y las partículas quedan como brillo
+    const nitidez = reducirMovimiento ? 1 : suave(Math.min(Math.max((t - 2.2) / 1.1, 0), 1));
+    materialNitido.opacity = nitidez * 0.95;
+    (logo.material as THREE.PointsMaterial).opacity = 1 - nitidez * 0.55;
+
     // La red aparece cuando el logo ya está armado
     const red = reducirMovimiento ? 1 : suave(Math.min(Math.max((t - 1.8) / 1.2, 0), 1));
     materialNodos.opacity = red * (0.75 + Math.sin(t * 2) * 0.15);
@@ -133,7 +136,8 @@ export function iniciarRed({ contenedor, reducirMovimiento }: Opciones) {
     materialPulsos.opacity = red;
     nodos.forEach((n, i) => {
       const f = reducirMovimiento ? 0.5 : (t * 0.35 + i / nodos.length) % 1;
-      pulsos.set([n.x + (centro.x - n.x) * f, n.y + (centro.y - n.y) * f, n.z + (centro.z - n.z) * f], i * 3);
+      const c = anclas[i];
+      pulsos.set([n.x + (c.x - n.x) * f, n.y + (c.y - n.y) * f, n.z + (c.z - n.z) * f], i * 3);
     });
     geoPulsos.attributes.position.needsUpdate = true;
 
@@ -149,4 +153,83 @@ export function iniciarRed({ contenedor, reducirMovimiento }: Opciones) {
   new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(contenedor);
   if (reducirMovimiento) dibujar(4);
   else renderer.setAnimationLoop(() => visible && dibujar(reloj.getElapsedTime()));
+}
+
+// Medidas del logo original (sinergia.jfif, en píxeles): eje de simetría x = 174.5, centro del óvalo y = 300.
+// Techo: dos trazos a 45° de 17 px; óvalo de 155 × 111.5 px con trazo de 9 px, visible en la mitad de abajo;
+// texto "sinergiahome" en geométrica (Questrial) de ascendente y = 295 a descendente y = 354.
+async function muestrearLogo(maximo: number) {
+  const ESCALA = 3; // resolución del lienzo respecto del logo original
+  const W = 400 * ESCALA, H = 260 * ESCALA, OX = 200 - 174.5, OY = 10 - 177; // el logo (y 177..416) entra en el lienzo
+  const lienzo = document.createElement('canvas');
+  lienzo.width = W;
+  lienzo.height = H;
+  const ctx = lienzo.getContext('2d', { willReadFrequently: true })!;
+  ctx.scale(ESCALA, ESCALA);
+  ctx.translate(OX, OY);
+
+  // Techo
+  ctx.strokeStyle = '#00f';
+  ctx.lineWidth = 17;
+  ctx.lineCap = 'butt';
+  ctx.beginPath();
+  ctx.moveTo(167, 184); ctx.lineTo(64, 287);
+  ctx.moveTo(182, 184); ctx.lineTo(285, 287);
+  ctx.stroke();
+
+  // Óvalo: se desvanece hacia arriba
+  const fundido = ctx.createLinearGradient(0, 255, 0, 305);
+  fundido.addColorStop(0, 'rgba(0,0,255,0)');
+  fundido.addColorStop(1, 'rgba(0,0,255,1)');
+  ctx.strokeStyle = fundido;
+  ctx.lineWidth = 9;
+  ctx.beginPath();
+  ctx.ellipse(174.5, 300, 155, 111.5, 0, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Texto en rojo puro para distinguirlo del dibujo al leer los píxeles
+  await document.fonts.load('400 60px Questrial').catch(() => {});
+  ctx.fillStyle = '#f00';
+  let tam = 60;
+  ctx.font = `400 ${tam}px Questrial, "Century Gothic", sans-serif`;
+  tam *= 352 / ctx.measureText('sinergiahome').width; // ancho visible del original
+  ctx.font = `400 ${tam}px Questrial, "Century Gothic", sans-serif`;
+  const medida = ctx.measureText('sinergiahome');
+  ctx.textAlign = 'center';
+  ctx.fillText('sinergiahome', 174.5, 295 + medida.actualBoundingBoxAscent);
+
+  // Leer píxeles y convertirlos en partículas
+  const datos = ctx.getImageData(0, 0, W, H).data;
+  const candidatos: [number, number, number, boolean][] = [];
+  for (let y = 0; y < H; y += 2) {
+    for (let x = 0; x < W; x += 2) {
+      const k = (y * W + x) * 4;
+      const alfa = datos[k + 3] / 255;
+      if (alfa < 0.08 || Math.random() > alfa) continue;
+      candidatos.push([x, y, alfa, datos[k] > datos[k + 2]]);
+    }
+  }
+  // Submuestreo parejo hasta el máximo de partículas
+  for (let i = candidatos.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [candidatos[i], candidatos[j]] = [candidatos[j], candidatos[i]];
+  }
+  const elegidos = candidatos.slice(0, maximo);
+  const UNIDAD = 9.6 / (350 * ESCALA); // 350 px del logo = 9,6 unidades de escena
+  const destino = new Float32Array(elegidos.length * 3);
+  const esTexto = new Uint8Array(elegidos.length);
+  elegidos.forEach(([x, y, , texto], i) => {
+    destino.set([(x - W / 2) * UNIDAD, -(y - H / 2) * UNIDAD, (Math.random() - 0.5) * (texto ? 0.06 : 0.25)], i * 3);
+    esTexto[i] = texto ? 1 : 0;
+  });
+  // Versión nítida en blanco del mismo dibujo, para superponerla cuando las partículas se arman
+  const nitido = document.createElement('canvas');
+  nitido.width = W;
+  nitido.height = H;
+  const cn = nitido.getContext('2d')!;
+  cn.drawImage(lienzo, 0, 0);
+  cn.globalCompositeOperation = 'source-in';
+  cn.fillStyle = '#fff';
+  cn.fillRect(0, 0, W, H);
+  return { destino, esTexto, nitido, ancho: W * UNIDAD, alto: H * UNIDAD, unidad: UNIDAD * ESCALA, centroY: -(OY + 300 - H / ESCALA / 2) * UNIDAD * ESCALA };
 }
