@@ -1,5 +1,6 @@
 ---
 // Una página por servicio: cada una apunta a una búsqueda local distinta (ej. "alarmas en Trelew")
+import { Image } from 'astro:assets';
 import Layout from '../../layouts/Layout.astro';
 import Icono from '../../components/Icono.astro';
 import { servicios, cobertura, enlaceContacto, type Servicio } from '../../data/sitio';
@@ -29,6 +30,12 @@ const otros = servicios.filter((s) => s.slug !== servicio.slug).slice(0, 4);
             ))}
           </ul>
           <p class="mt-8 text-gris"><strong class="text-tinta">Ideal para:</strong> {servicio.ideal}</p>
+          {servicio.foto && (
+            <figure class="mt-10 overflow-hidden rounded-3xl">
+              <Image src={servicio.foto} alt={`${servicio.nombre}: obra de Sinergia Home`} width={760} class="aspect-[16/10] w-full object-cover" />
+              <figcaption class="mt-2 text-xs text-gris">Obra real de Sinergia Home</figcaption>
+            </figure>
+          )}
         </div>
         <aside class="h-fit rounded-[2rem] border border-linea bg-white p-8 lg:sticky lg:top-28">
           <h2 class="font-display text-2xl font-semibold">¿Lo querés en tu casa o negocio?</h2>

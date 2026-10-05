@@ -4,7 +4,7 @@ import Layout from '../layouts/Layout.astro';
 import RedSinergia from '../components/RedSinergia.astro';
 import ArmaTuProyecto from '../components/ArmaTuProyecto.astro';
 import Icono from '../components/Icono.astro';
-import { servicios, casos, marcas, pasos, cobertura, preguntas, enlaceContacto } from '../data/sitio';
+import { servicios, casos, marcas, pasos, cobertura, preguntas, galeria, cedia, enlaceContacto } from '../data/sitio';
 
 const antetitulo = 'text-xs font-semibold tracking-[4px] text-marca uppercase';
 const h2 = 'mt-3 font-display text-4xl leading-[1.05] font-semibold tracking-tight sm:text-5xl';
@@ -100,8 +100,41 @@ const h2 = 'mt-3 font-display text-4xl leading-[1.05] font-semibold tracking-tig
       </div>
     </section>
 
-    <!-- Cómo trabajamos -->
+    <!-- En obra: galería -->
     <section class="px-5 py-24">
+      <div class="mx-auto max-w-6xl">
+        <div class="flex flex-col justify-between gap-6 md:flex-row md:items-end" data-revelar>
+          <div>
+            <p class={antetitulo}>En obra</p>
+            <h2 class={h2}>Así trabajamos<br />día a día.</h2>
+          </div>
+          <a href="https://www.instagram.com/sinergiahome/" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-sm font-semibold text-marca">
+            <Icono nombre="instagram" class="size-4" /> Ver más en Instagram
+          </a>
+        </div>
+        <div class="mt-12 columns-2 gap-4 md:columns-3">
+          {galeria.map((g) => (
+            <figure class="group relative mb-4 break-inside-avoid overflow-hidden rounded-3xl bg-suave" data-revelar>
+              <Image src={g.foto} alt={g.texto} width={520} class={`w-full object-cover transition duration-700 group-hover:scale-105 ${g.alto ? 'aspect-[3/4.4]' : 'aspect-[4/3.6]'}`} />
+              <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-4 pt-10 text-sm font-medium text-white">{g.texto}</figcaption>
+            </figure>
+          ))}
+        </div>
+
+        <!-- CEDIA -->
+        <div class="mt-8 grid items-center gap-6 overflow-hidden rounded-[2rem] bg-noche text-white md:grid-cols-[280px_1fr]" data-revelar>
+          <Image src={cedia.foto} alt="CEDIA 2024, Denver" width={560} class="aspect-[4/3] size-full object-cover md:aspect-auto md:h-full" />
+          <div class="p-8 md:py-10 md:pr-12 md:pl-2">
+            <p class="text-xs font-semibold tracking-[4px] text-[#8fa8ff] uppercase">Formación internacional</p>
+            <h3 class="mt-2 font-display text-3xl font-semibold">{cedia.titulo}</h3>
+            <p class="mt-3 max-w-xl text-white/70">{cedia.texto}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cómo trabajamos -->
+    <section class="bg-suave px-5 py-24">
       <div class="mx-auto max-w-6xl">
         <div data-revelar>
           <p class={antetitulo}>Cómo trabajamos</p>
@@ -109,7 +142,7 @@ const h2 = 'mt-3 font-display text-4xl leading-[1.05] font-semibold tracking-tig
         </div>
         <ol class="mt-12 grid gap-4 md:grid-cols-4">
           {pasos.map((p, i) => (
-            <li class="rounded-3xl border border-linea p-6" data-revelar>
+            <li class="rounded-3xl bg-white p-6 ring-1 ring-linea" data-revelar>
               <span class="grid size-10 place-items-center rounded-full bg-marca font-display font-semibold text-white">{i + 1}</span>
               <h3 class="mt-4 font-display text-xl font-semibold">{p.titulo}</h3>
               <p class="mt-2 text-sm leading-relaxed text-gris">{p.texto}</p>
@@ -120,7 +153,7 @@ const h2 = 'mt-3 font-display text-4xl leading-[1.05] font-semibold tracking-tig
     </section>
 
     <!-- Arquitectos y desarrolladores -->
-    <section id="arquitectos" class="px-5">
+    <section id="arquitectos" class="px-5 pt-24">
       <div class="relative mx-auto grid max-w-6xl gap-8 overflow-hidden rounded-[2rem] bg-marca p-8 text-white md:grid-cols-[1.3fr_1fr] md:items-center md:p-12" data-revelar>
         <svg class="pointer-events-none absolute -right-16 -bottom-24 w-[30rem] opacity-15" viewBox="0 0 240 120" aria-hidden="true">
           <ellipse cx="120" cy="74" rx="112" ry="38" fill="none" stroke="#fff" stroke-width="4" />
