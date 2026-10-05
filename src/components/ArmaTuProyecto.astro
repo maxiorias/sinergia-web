@@ -7,10 +7,10 @@ import { servicios, cobertura, empresa, enlaceInstagramDM } from '../data/sitio'
 const lugares = ['Casa', 'Departamento', 'Local o comercio', 'Oficina o empresa', 'Obra nueva / desarrollo'];
 const zonas = [...cobertura.map((c) => c.ciudad), 'Otra zona'];
 const chip =
-  'cursor-pointer rounded-xl border border-borde px-3.5 py-2.5 text-sm text-niebla transition select-none hover:border-acento/50 has-[:checked]:border-acento has-[:checked]:bg-acento/10 has-[:checked]:text-white';
+  'cursor-pointer rounded-xl border border-linea px-3.5 py-2.5 text-sm text-gris transition select-none hover:border-marca/40 has-[:checked]:border-marca has-[:checked]:bg-azul-claro has-[:checked]:text-marca';
 ---
 
-<form id="arma-proyecto" class="rounded-[2rem] border border-borde bg-panel p-6 sm:p-9" data-whatsapp={empresa.whatsapp} data-instagram={enlaceInstagramDM}>
+<form id="arma-proyecto" class="rounded-[2rem] border border-linea bg-white p-6 sm:p-9" data-whatsapp={empresa.whatsapp} data-instagram={enlaceInstagramDM}>
   <fieldset>
     <legend class="font-display text-lg font-semibold">1. ¿Qué querés sumar?</legend>
     <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -41,15 +41,15 @@ const chip =
     </div>
   </fieldset>
 
-  <div class="mt-8 rounded-2xl border border-dashed border-borde bg-noche/60 p-4">
-    <p class="text-xs font-semibold tracking-[3px] text-niebla uppercase">Tu mensaje</p>
+  <div class="mt-8 rounded-2xl border border-dashed border-linea bg-suave p-4">
+    <p class="text-xs font-semibold tracking-[3px] text-gris uppercase">Tu mensaje</p>
     <p id="vista-mensaje" class="mt-2 text-sm leading-relaxed"></p>
   </div>
 
-  <button type="submit" class="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-acento px-6 py-4 font-semibold text-noche transition hover:brightness-110">
+  <button type="submit" class="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-marca px-6 py-4 font-semibold text-white transition hover:bg-azul">
     <Icono nombre="mensaje" class="size-5" /> <span id="texto-boton">Enviar consulta</span>
   </button>
-  <p id="aviso-copia" class="mt-3 text-center text-xs text-niebla" aria-live="polite"></p>
+  <p id="aviso-copia" class="mt-3 text-center text-xs text-gris" aria-live="polite"></p>
 </form>
 
 <script>

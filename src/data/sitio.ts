@@ -110,12 +110,16 @@ export const servicios: Servicio[] = [
   },
 ];
 
-// Obras y novedades: sacadas de sus publicaciones
+// Obras y novedades: sacadas de sus publicaciones (fotos: capturas de su Instagram, reemplazar por originales)
+import fotoGenerac from '../assets/obras/generac.jpg';
+import fotoCrestron from '../assets/obras/crestron.jpg';
+import fotoVimar from '../assets/obras/vimar.jpg';
+
 export const casos = [
-  { titulo: 'Automatización con Generac', texto: 'Puesta en marcha y automatización de un grupo electrógeno Generac.', etiqueta: 'Energía' },
-  { titulo: 'Sala de videoconferencia Crestron', texto: 'Sistema de videoconferencia profesional para reuniones.', etiqueta: 'Audio y video' },
-  { titulo: 'Seguridad con IA', texto: 'Radares, domos PTZ y reconocimiento facial a 150 metros.', etiqueta: 'Cámaras' },
-  { titulo: 'Línea italiana Vimar', texto: 'Teclas y tomas de diseño para proyectos de arquitectura.', etiqueta: 'Domótica' },
+  { titulo: 'Sala de videoconferencia Crestron', lugar: 'Gobierno del Chubut', texto: 'Sistema de videoconferencia profesional con panel de control táctil.', etiqueta: 'Audio y video', foto: fotoCrestron },
+  { titulo: 'Automatización con Generac', lugar: 'Puesta en marcha', texto: 'Instalación y automatización de grupo electrógeno para que la casa nunca se quede sin energía.', etiqueta: 'Energía', foto: fotoGenerac },
+  { titulo: 'Línea italiana Vimar', lugar: 'Para arquitectos', texto: 'Teclas y tomas de diseño para proyectos de arquitectura y desarrollos.', etiqueta: 'Domótica', foto: fotoVimar },
+  { titulo: 'Seguridad con IA', lugar: 'Cámaras y radares', texto: 'Radares, domos PTZ y reconocimiento facial a 150 metros.', etiqueta: 'Cámaras', foto: undefined },
 ];
 
 export const marcas = ['Crestron', 'Vimar', 'Generac', 'Google Home'];
